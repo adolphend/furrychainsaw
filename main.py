@@ -361,7 +361,7 @@ class ThzImaging():
         except:
             pass
         return string
-stupidTest = 1
+stupidTest = 0
 analysisMask()
 analysisFOV()
 analysisProp()
