@@ -1,2 +1,2 @@
-from .gaussianbeam import GaussianBeam
-from .discretefresnel import DiscreteFresnel
+from .gaussianbeamtensor import GaussianBeam
+from .discretefresneltensor import DiscreteFresnel
