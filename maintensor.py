@@ -100,13 +100,13 @@ def deltaDistance(z0, zn, D0, DZ, n=100):
             maskP = np.dot(df, maskTHz)
 
 def analysisMask():
-    z = torch.tensor(100)
-    Delta = torch.tensor(0.5)
-    N = torch.tensor(32)
-    f = torch.tensor(100)
-    l = torch.tensor(10)
+    z = torch.tensor(100).to(device)
+    Delta = torch.tensor(0.5).to(device)
+    N = torch.tensor(32).to(device)
+    f = torch.tensor(100).to(device)
+    l = torch.tensor(10).to(device)
     fl = f + l
-    wavelength = torch.tensor(0.856)
+    wavelength = torch.tensor(0.856).to(device)
     w0 = torch.tensor(1)
     if stupidTest: N=4
     gb = GaussianBeam(wavelength, w0)
@@ -116,7 +116,7 @@ def analysisMask():
     masks = torch.from_numpy(hadamard(N*N))
     masksThz = []
     df = DiscreteFresnel(wavelength, Delta, Delta, Delta, Delta, N, N)
-    dms = df.computeGD(z)
+    dms = df.computeGD(z.to(device))
     title = "mask projection z: %.1f mm, Delta: %.1f mm, N: %d"%(z,Delta,N)
     fig, axis = plt.subplots(2,2)
     fig.suptitle(title)
@@ -164,11 +164,11 @@ def analysisMask():
         
 
 def analysisFOV():
-    w0 = torch.tensor(1)
-    wavelength = torch.tensor(0.856)
-    N = torch.tensor(100)
-    Delta = torch.tensor(0.5)
-    f = torch.tensor(100)
+    w0 = torch.tensor(1).to(device)
+    wavelength = torch.tensor(0.856).to(device)
+    N = torch.tensor(100).to(device)
+    Delta = torch.tensor(0.5).to(device)
+    f = torch.tensor(100).to(device)
     gb = GaussianBeam(wavelength, w0)
     X, Y = generateFxFy(N, N, Delta, Delta)
     frames = 1000
@@ -207,16 +207,16 @@ def analysisFOV():
 
 
 def analysisProp():
-    w0 = torch.tensor(1)
-    wavelength = torch.tensor(0.856)
-    N = torch.tensor(32)
-    f = torch.tensor(100)
-    Delta = torch.arange(100) * 0.05 + 0.05
-    z = torch.arange(100) * 10 + 10
+    w0 = torch.tensor(1).to(device)
+    wavelength = torch.tensor(0.856).to(device)
+    N = torch.tensor(32).to(device)
+    f = torch.tensor(100).to(device)
+    Delta = (torch.arange(100) * 0.05 + 0.05).to(device)
+    z = (torch.arange(100) * 10 + 10).to(device)
     fig, axis=plt.subplots(2,2)
     fig.suptitle("Propagation analysis")
     fig.tight_layout()
-    if stupidTest: z, Delta = torch.tensor([10, 100]), torch.tensor([0.05, .5])
+    if stupidTest: z, Delta = torch.tensor([10, 100]).to(device), torch.tensor([0.05, .5]).to(device)
     def init():
         sns.heatmap(np.zeros((N,N)), ax=axis[0,0], cbar=False)
         sns.heatmap(np.zeros((N,N)), ax=axis[0,1], cbar=False)
@@ -229,13 +229,13 @@ def analysisProp():
         [[(i.clear(), i.set_axis_off()) for i in ax] for ax in axis]
         gb = GaussianBeam(wavelength, w0)
         X, Y = generateFxFy(N, N, Delta[l], Delta[l])
-        e, p = gb.computeE(X, Y, z=f+10, f=f)
+        e, p = gb.computeE(X, Y, z=f+torch.tensor(10).to(device), f=f)
         masks = hadamard(N*N)
         mask = torch.from_numpy(masks[0]).to(device)
         maskThz = (e * p ).reshape(-1) * mask
         df = DiscreteFresnel(wavelength, Delta[l], Delta[l], Delta[l], Delta[l], N, N)
         Dms = df.computeGD(z[k])
-        Dsl = df.computeGD(z[k] + 10)
+        Dsl = df.computeGD(z[k] + torch.tensor(10).to(device))
         XS = torch.matmul(Dms, maskThz)
         XL = torch.matmul(Dsl, XS)
         XS = XS.cpu().numpy()
