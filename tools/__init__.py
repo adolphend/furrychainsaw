@@ -1,2 +1,3 @@
-from .tools import heatmapfile
-from .tools import generateFxFy
+from .toolstensor import heatmapfile
+from .toolstensor import generateFxFy
+from .copram import CoPRAM
